@@ -1,0 +1,114 @@
+
+SECTION 1: Machine Learning Group Project: Titanic Survival Prediction
+
+SECTION 1.1: Table of Contents
+   CODE [1.1.0] (Cell 2): import pandas as pd
+
+SECTION 1.2: 1. Introduction
+
+SECTION 1.2.1: 1.1 Dataset Overview
+
+SECTION 1.2.2: 1.2 Project Objectives
+
+SECTION 1.2.3: 1.3 Dataset Features
+
+SECTION 1.3: 2. Data Collection and Preprocessing
+
+SECTION 1.3.1: 2.1 Load Dataset
+   CODE [1.3.1] (Cell 5): from download_data import download_titanic_dataset
+
+SECTION 1.3.2: 2.2 Initial Data Exploration
+   CODE [1.3.2] (Cell 7): exploration = explore_data(df)
+   CODE [1.3.2] (Cell 8): print("\nData Types:")
+   CODE [1.3.2] (Cell 9): print("\nNumerical Features Summary:")
+   CODE [1.3.2] (Cell 10): print("\nCategorical Features Summary:")
+
+SECTION 1.3.3: 2.3 Exploratory Data Analysis (EDA)
+   CODE [1.3.3] (Cell 12): plot_missing_values(df, save_path='../outputs/figures/missing_values.png')
+   CODE [1.3.3] (Cell 14): plot_target_distribution(df, target_col='Survived', save_path='../outputs/figures/target_distribution.png')
+   CODE [1.3.3] (Cell 16): numerical_cols = ['Age', 'Fare', 'SibSp', 'Parch']
+   CODE [1.3.3] (Cell 18): categorical_cols = ['Sex', 'Pclass', 'Embarked']
+   CODE [1.3.3] (Cell 20): plot_correlation_matrix(df, save_path='../outputs/figures/correlation_matrix.png')
+   CODE [1.3.3] (Cell 22): plot_feature_vs_target(df, 'Sex', target_col='Survived', save_path='../outputs/figures/sex_vs_survival.png')
+   CODE [1.3.3] (Cell 23): plot_feature_vs_target(df, 'Pclass', target_col='Survived', save_path='../outputs/figures/pclass_vs_survival.png')
+   CODE [1.3.3] (Cell 24): plot_feature_vs_target(df, 'Age', target_col='Survived', save_path='../outputs/figures/age_vs_survival.png')
+   CODE [1.3.3] (Cell 26): outliers = detect_outliers(df, ['Age', 'Fare'])
+   CODE [1.3.3] (Cell 27): plot_boxplots(df, ['Age', 'Fare', 'SibSp', 'Parch'], save_path='../outputs/figures/boxplots.png')
+
+SECTION 1.3.4: 2.4 Data Cleaning
+   CODE [1.3.4] (Cell 29): df_clean = handle_missing_values(df)
+   CODE [1.3.4] (Cell 31): df_engineered = feature_engineering(df_clean)
+   CODE [1.3.4] (Cell 33): df_encoded = encode_categorical(df_engineered, target_col='Survived')
+
+SECTION 1.3.5: 2.5 Prepare Data for Modeling
+   CODE [1.3.5] (Cell 35): X, y = prepare_features(df_encoded, target_col='Survived')
+   CODE [1.3.5] (Cell 36): X_train, X_test, y_train, y_test = split_data(X, y, test_size=0.2, random_state=42)
+   CODE [1.3.5] (Cell 37): X_train_scaled, X_test_scaled, scaler = scale_features(X_train, X_test)
+   CODE [1.3.5] (Cell 38): save_processed_data(df_encoded, '../data/processed/titanic_processed.csv')
+
+SECTION 1.4: 3. Supervised Learning
+
+SECTION 1.4.1: 3.1 Initialize Models
+   CODE [1.4.1] (Cell 40): supervised = SupervisedModels()
+
+SECTION 1.4.2: 3.2 Train Models
+   CODE [1.4.2] (Cell 42): supervised.train_all_models(X_train_scaled, y_train)
+
+SECTION 1.4.3: 3.3 Evaluate Models
+   CODE [1.4.3] (Cell 44): results_df = supervised.evaluate_all_models(X_test_scaled, y_test)
+
+SECTION 1.4.4: 3.4 Model Comparison Visualization
+   CODE [1.4.4] (Cell 46): plot_model_comparison(results_df, save_path='../outputs/figures/model_comparison.png')
+
+SECTION 1.4.5: 3.5 Best Model Analysis
+   CODE [1.4.5] (Cell 48): best_model_name = supervised.best_model_name
+   CODE [1.4.5] (Cell 49): if supervised.results[best_model_name]['probabilities'] is not None:
+
+SECTION 1.4.6: 3.6 Feature Importance
+   CODE [1.4.6] (Cell 51): importance_df = supervised.get_feature_importance('Random Forest', X_train.columns)
+
+SECTION 1.4.7: 3.7 Cross-Validation
+   CODE [1.4.7] (Cell 53): cv_results = supervised.cross_validate(best_model_name, X_train_scaled, y_train, cv=5)
+
+SECTION 1.4.8: 3.8 Save Best Model
+   CODE [1.4.8] (Cell 55): supervised.save_model(best_model_name, f'../outputs/models/{best_model_name.lower().replace(" ", "_")}.pkl')
+
+SECTION 1.5: 4. Unsupervised Learning
+
+SECTION 1.5.1: 4.1 Prepare Data for Clustering
+   CODE [1.5.1] (Cell 57): X_clustering = X_train_scaled.copy()
+
+SECTION 1.5.2: 4.2 Dimensionality Reduction with PCA
+   CODE [1.5.2] (Cell 59): unsupervised = UnsupervisedModels()
+   CODE [1.5.2] (Cell 61): unsupervised.plot_pca_variance(pca_results, save_path='../outputs/figures/pca_variance.png')
+
+SECTION 1.5.3: 4.3 K-Means Clustering
+   CODE [1.5.3] (Cell 63): optimal_results = unsupervised.find_optimal_clusters(X_clustering, max_clusters=10)
+   CODE [1.5.3] (Cell 64): unsupervised.plot_elbow_curve(optimal_results, save_path='../outputs/figures/elbow_curve.png')
+   CODE [1.5.3] (Cell 66): kmeans_results = unsupervised.perform_kmeans(X_clustering, n_clusters=3)
+   CODE [1.5.3] (Cell 68): unsupervised.plot_clusters_2d(X_clustering, kmeans_results['labels'],
+   CODE [1.5.3] (Cell 70): cluster_summary = unsupervised.analyze_clusters(X_train, kmeans_results['labels'], cluster_name='KMeans_Cluster')
+   CODE [1.5.3] (Cell 71): cluster_survival = pd.DataFrame({
+
+SECTION 1.5.4: 4.4 Hierarchical Clustering
+   CODE [1.5.4] (Cell 73): unsupervised.plot_dendrogram(X_clustering[:100], save_path='../outputs/figures/dendrogram.png', max_display=30)
+   CODE [1.5.4] (Cell 75): hierarchical_results = unsupervised.perform_hierarchical_clustering(X_clustering, n_clusters=3, linkage_method='ward')
+   CODE [1.5.4] (Cell 76): unsupervised.plot_clusters_2d(X_clustering, hierarchical_results['labels'],
+
+SECTION 1.6: 5. Insights and Conclusions
+
+SECTION 1.6.1: 5.1 Key Findings from Supervised Learning
+   CODE [1.6.1] (Cell 78): print("="*60)
+
+SECTION 1.6.2: 5.2 Key Findings from Unsupervised Learning
+   CODE [1.6.2] (Cell 80): print("="*60)
+
+SECTION 1.6.3: 5.3 Patterns and Trends Discovered
+
+SECTION 1.6.4: 5.4 Recommendations
+
+SECTION 1.6.5: 5.5 Challenges and Solutions
+
+SECTION 1.6.6: 5.6 Conclusion
+
+SECTION 1.7: Project Completion
